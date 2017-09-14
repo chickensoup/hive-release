@@ -268,6 +268,13 @@ public class DummyRawStoreControlledCommit implements RawStore, Configurable {
     objectStore.alterPartitions(dbName, tblName, partValsList, newParts);
   }
 
+    @Override
+  public void alterPartitionsForTables(String dbname, Map<String,
+      List<List<String>>> table_partVals, Map<String, List<Partition>> table_newParts)
+      throws InvalidObjectException, MetaException {
+    objectStore.alterPartitionsForTables(dbname, table_partVals, table_newParts);
+  }
+
   @Override
   public boolean addIndex(Index index) throws InvalidObjectException, MetaException {
     return objectStore.addIndex(index);

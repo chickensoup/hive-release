@@ -950,7 +950,7 @@ public class Stage implements org.apache.thrift.TBase<Stage, Stage._Fields>, jav
                 struct.taskList = new ArrayList<Task>(_list80.size);
                 for (int _i81 = 0; _i81 < _list80.size; ++_i81)
                 {
-                  Task _elem82; // required
+                  Task _elem82; // optional
                   _elem82 = new Task();
                   _elem82.read(iprot);
                   struct.taskList.add(_elem82);
@@ -1176,7 +1176,7 @@ public class Stage implements org.apache.thrift.TBase<Stage, Stage._Fields>, jav
           struct.taskList = new ArrayList<Task>(_list97.size);
           for (int _i98 = 0; _i98 < _list97.size; ++_i98)
           {
-            Task _elem99; // required
+            Task _elem99; // optional
             _elem99 = new Task();
             _elem99.read(iprot);
             struct.taskList.add(_elem99);

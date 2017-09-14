@@ -1316,9 +1316,16 @@ public class HiveMetaStoreClient implements IMetaStoreClient {
 
   @Override
   public void alter_partitions(String dbName, String tblName, List<Partition> newParts)
-  throws InvalidOperationException, MetaException, TException {
+      throws InvalidOperationException, MetaException, TException {
     client.alter_partitions(dbName, tblName, newParts);
-}
+  }
+
+  @Override
+  public void alter_partitions_for_tables(String dbName, Map<String, List<Partition>> tblParts)
+    throws InvalidOperationException, MetaException, TException {
+        client.alter_partitions_for_tables(dbName, tblParts);
+      }
+
 
   @Override
   public void alterDatabase(String dbName, Database db)

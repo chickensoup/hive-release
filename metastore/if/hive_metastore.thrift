@@ -22,7 +22,7 @@
 # Thrift Service that the MetaStore is built on
 #
 
-include "share/fb303/if/fb303.thrift"
+include "share/fb303.thrift"
 
 namespace java org.apache.hadoop.hive.metastore.api
 namespace php metastore
@@ -996,6 +996,10 @@ service ThriftHiveMetastore extends fb303.FacebookService
   // change a list of partitions. All partitions are altered atomically and all
   // prehooks are fired together followed by all post hooks
   void alter_partitions(1:string db_name, 2:string tbl_name, 3:list<Partition> new_parts)
+                       throws (1:InvalidOperationException o1, 2:MetaException o2)
+
+  // changes multiple partitions for multiple tables.
+  void alter_partitions_for_tables(1:string db_name, 2:map<string, list<Partition>> tbl_parts)
                        throws (1:InvalidOperationException o1, 2:MetaException o2)
 
   void alter_partition_with_environment_context(1:string db_name,

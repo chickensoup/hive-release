@@ -1018,6 +1018,22 @@ module ThriftHiveMetastore
       return
     end
 
+    def alter_partitions_for_tables(db_name, tbl_parts)
+      send_alter_partitions_for_tables(db_name, tbl_parts)
+      recv_alter_partitions_for_tables()
+    end
+
+    def send_alter_partitions_for_tables(db_name, tbl_parts)
+      send_message('alter_partitions_for_tables', Alter_partitions_for_tables_args, :db_name => db_name, :tbl_parts => tbl_parts)
+    end
+
+    def recv_alter_partitions_for_tables()
+      result = receive_message(Alter_partitions_for_tables_result)
+      raise result.o1 unless result.o1.nil?
+      raise result.o2 unless result.o2.nil?
+      return
+    end
+
     def alter_partition_with_environment_context(db_name, tbl_name, new_part, environment_context)
       send_alter_partition_with_environment_context(db_name, tbl_name, new_part, environment_context)
       recv_alter_partition_with_environment_context()
@@ -2876,6 +2892,19 @@ module ThriftHiveMetastore
         result.o2 = o2
       end
       write_result(result, oprot, 'alter_partitions', seqid)
+    end
+
+    def process_alter_partitions_for_tables(seqid, iprot, oprot)
+      args = read_args(iprot, Alter_partitions_for_tables_args)
+      result = Alter_partitions_for_tables_result.new()
+      begin
+        @handler.alter_partitions_for_tables(args.db_name, args.tbl_parts)
+      rescue ::InvalidOperationException => o1
+        result.o1 = o1
+      rescue ::MetaException => o2
+        result.o2 = o2
+      end
+      write_result(result, oprot, 'alter_partitions_for_tables', seqid)
     end
 
     def process_alter_partition_with_environment_context(seqid, iprot, oprot)
@@ -5968,6 +5997,42 @@ module ThriftHiveMetastore
   end
 
   class Alter_partitions_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    O1 = 1
+    O2 = 2
+
+    FIELDS = {
+      O1 => {:type => ::Thrift::Types::STRUCT, :name => 'o1', :class => ::InvalidOperationException},
+      O2 => {:type => ::Thrift::Types::STRUCT, :name => 'o2', :class => ::MetaException}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Alter_partitions_for_tables_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    DB_NAME = 1
+    TBL_PARTS = 2
+
+    FIELDS = {
+      DB_NAME => {:type => ::Thrift::Types::STRING, :name => 'db_name'},
+      TBL_PARTS => {:type => ::Thrift::Types::MAP, :name => 'tbl_parts', :key => {:type => ::Thrift::Types::STRING}, :value => {:type => ::Thrift::Types::LIST, :element => {:type => ::Thrift::Types::STRUCT, :class => ::Partition}}}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Alter_partitions_for_tables_result
     include ::Thrift::Struct, ::Thrift::Struct_Union
     O1 = 1
     O2 = 2

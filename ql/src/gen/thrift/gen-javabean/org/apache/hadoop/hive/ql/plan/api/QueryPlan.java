@@ -508,7 +508,7 @@ public class QueryPlan implements org.apache.thrift.TBase<QueryPlan, QueryPlan._
                 struct.queries = new ArrayList<Query>(_list128.size);
                 for (int _i129 = 0; _i129 < _list128.size; ++_i129)
                 {
-                  Query _elem130; // required
+                  Query _elem130; // optional
                   _elem130 = new Query();
                   _elem130.read(iprot);
                   struct.queries.add(_elem130);
@@ -622,7 +622,7 @@ public class QueryPlan implements org.apache.thrift.TBase<QueryPlan, QueryPlan._
           struct.queries = new ArrayList<Query>(_list133.size);
           for (int _i134 = 0; _i134 < _list133.size; ++_i134)
           {
-            Query _elem135; // required
+            Query _elem135; // optional
             _elem135 = new Query();
             _elem135.read(iprot);
             struct.queries.add(_elem135);

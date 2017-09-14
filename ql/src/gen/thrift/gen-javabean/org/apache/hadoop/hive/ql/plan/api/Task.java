@@ -1044,7 +1044,7 @@ public class Task implements org.apache.thrift.TBase<Task, Task._Fields>, java.i
                 struct.operatorList = new ArrayList<Operator>(_list52.size);
                 for (int _i53 = 0; _i53 < _list52.size; ++_i53)
                 {
-                  Operator _elem54; // required
+                  Operator _elem54; // optional
                   _elem54 = new Operator();
                   _elem54.read(iprot);
                   struct.operatorList.add(_elem54);
@@ -1290,7 +1290,7 @@ public class Task implements org.apache.thrift.TBase<Task, Task._Fields>, java.i
           struct.operatorList = new ArrayList<Operator>(_list69.size);
           for (int _i70 = 0; _i70 < _list69.size; ++_i70)
           {
-            Operator _elem71; // required
+            Operator _elem71; // optional
             _elem71 = new Operator();
             _elem71.read(iprot);
             struct.operatorList.add(_elem71);

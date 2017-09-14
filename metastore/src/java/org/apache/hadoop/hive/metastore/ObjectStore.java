@@ -2915,6 +2915,44 @@ public class ObjectStore implements RawStore, Configurable {
     }
   }
 
+  @Override
+  public void alterPartitionsForTables(String dbname, Map<String, List<List<String>>> table_partVals,
+      Map<String, List<Partition>> table_newParts) throws InvalidObjectException, MetaException {
+    boolean success = false;
+    Exception e = null;
+    try {
+      openTransaction();
+      for (Map.Entry<String, List<List<String>>> entry: table_partVals.entrySet()) {
+        String tableName = entry.getKey();
+        List<List<String>> part_vals = entry.getValue();
+        List<Partition> newParts = null;
+        if (table_newParts.containsKey(tableName)) {
+          newParts = table_newParts.get(tableName);
+        }
+
+        Iterator<List<String>> part_val_itr = part_vals.iterator();
+        for (Partition tmpPart: newParts) {
+          List<String> tmpPartVals = part_val_itr.next();
+          alterPartitionNoTxn(dbname, tableName, tmpPartVals, tmpPart);
+        }
+      }
+      success = commitTransaction();
+    } catch (Exception exception) {
+      e = exception;
+    } finally {
+      if (!success) {
+        rollbackTransaction();
+        MetaException metaException = new MetaException(
+                "The transaction for alter partitions for tables did not commit successfully.");
+        if (e != null) {
+          metaException.initCause(e);
+        }
+        throw metaException;
+      }
+    }
+  }
+
+
   private void copyMSD(MStorageDescriptor newSd, MStorageDescriptor oldSd) {
     oldSd.setLocation(newSd.getLocation());
     MColumnDescriptor oldCD = oldSd.getCD();

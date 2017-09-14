@@ -552,7 +552,7 @@ public class Graph implements org.apache.thrift.TBase<Graph, Graph._Fields>, jav
                 struct.roots = new ArrayList<String>(_list8.size);
                 for (int _i9 = 0; _i9 < _list8.size; ++_i9)
                 {
-                  String _elem10; // required
+                  String _elem10; // optional
                   _elem10 = iprot.readString();
                   struct.roots.add(_elem10);
                 }
@@ -570,7 +570,7 @@ public class Graph implements org.apache.thrift.TBase<Graph, Graph._Fields>, jav
                 struct.adjacencyList = new ArrayList<Adjacency>(_list11.size);
                 for (int _i12 = 0; _i12 < _list11.size; ++_i12)
                 {
-                  Adjacency _elem13; // required
+                  Adjacency _elem13; // optional
                   _elem13 = new Adjacency();
                   _elem13.read(iprot);
                   struct.adjacencyList.add(_elem13);
@@ -689,7 +689,7 @@ public class Graph implements org.apache.thrift.TBase<Graph, Graph._Fields>, jav
           struct.roots = new ArrayList<String>(_list18.size);
           for (int _i19 = 0; _i19 < _list18.size; ++_i19)
           {
-            String _elem20; // required
+            String _elem20; // optional
             _elem20 = iprot.readString();
             struct.roots.add(_elem20);
           }
@@ -702,7 +702,7 @@ public class Graph implements org.apache.thrift.TBase<Graph, Graph._Fields>, jav
           struct.adjacencyList = new ArrayList<Adjacency>(_list21.size);
           for (int _i22 = 0; _i22 < _list21.size; ++_i22)
           {
-            Adjacency _elem23; // required
+            Adjacency _elem23; // optional
             _elem23 = new Adjacency();
             _elem23.read(iprot);
             struct.adjacencyList.add(_elem23);

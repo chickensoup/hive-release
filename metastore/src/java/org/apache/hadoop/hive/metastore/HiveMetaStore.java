@@ -2923,8 +2923,8 @@ public class HiveMetaStore extends ThriftHiveMetastore {
      * Fire a pre-event for read table operation, if there are any
      * pre-event listeners registered
      *
-     * @param db_name
-     * @param tbl_name
+     * @param dbName
+     * @param tblName
      * @throws MetaException
      * @throws NoSuchObjectException
      */
@@ -3340,6 +3340,78 @@ public class HiveMetaStore extends ThriftHiveMetastore {
         }
       } finally {
         endFunction("alter_partition", oldParts != null, ex, tbl_name);
+      }
+      return;
+    }
+
+    @Override
+    public void alter_partitions_for_tables(final String db_name, final Map<String, List<Partition>> tbl_parts)
+            throws InvalidOperationException, MetaException, TException {
+      startTableFunction("alter_partitions_for_tables", db_name, tbl_parts.toString());
+
+      if (LOG.isInfoEnabled()) {
+        for (Map.Entry<String, List<Partition>> tblPartition: tbl_parts.entrySet()) {
+          for (Partition part: tblPartition.getValue()) {
+            LOG.info("Table: " + tblPartition.getKey() + ", new partition value: " + part.getSd().getLocation());
+          }
+        }
+      }
+      // all partitions are altered atomically
+      // all prehooks are fired together followed by all post hooks
+      Map<String, List<Partition>> oldTblParts = null;
+      Exception ex = null;
+      try {
+        for (Map.Entry<String, List<Partition>> tblPartition: tbl_parts.entrySet()) {
+          String tbl_name = tblPartition.getKey();
+          for (Partition tmpPart: tblPartition.getValue()) {
+            firePreEvent(new PreAlterPartitionEvent(db_name, tbl_name, null, tmpPart, this));
+          }
+        }
+
+        oldTblParts = alterHandler.alterPartitionsForTables(getMS(), wh, db_name, tbl_parts);
+
+        for (Map.Entry<String, List<Partition>> entry: oldTblParts.entrySet()) {
+          String tableName = entry.getKey();
+          Iterator<Partition> olditr = entry.getValue().iterator();
+          // Only fetch the table if we have a listener that needs it.
+          Table table = null;
+          for (Partition tmpPart : tbl_parts.get(tableName)) {
+            Partition oldTmpPart = null;
+            if (olditr.hasNext()) {
+              oldTmpPart = olditr.next();
+            }
+            else {
+              throw new InvalidOperationException("failed to alter partitions");
+            }
+            for (MetaStoreEventListener listener : listeners) {
+              if (table == null) {
+                table = getMS().getTable(db_name, tableName);
+              }
+              AlterPartitionEvent alterPartitionEvent =
+                      new AlterPartitionEvent(oldTmpPart, tmpPart, table, true, this);
+              listener.onAlterPartition(alterPartitionEvent);
+            }
+          }
+        }
+      } catch (InvalidObjectException e) {
+        ex = e;
+        throw new InvalidOperationException(e.getMessage());
+      } catch (AlreadyExistsException e) {
+        ex = e;
+        throw new InvalidOperationException(e.getMessage());
+      } catch (Exception e) {
+        ex = e;
+        if (e instanceof MetaException) {
+          throw (MetaException) e;
+        } else if (e instanceof InvalidOperationException) {
+          throw (InvalidOperationException) e;
+        } else if (e instanceof TException) {
+          throw (TException) e;
+        } else {
+          throw newMetaException(e);
+        }
+      } finally {
+        endFunction("alter_partitions_for_tables", oldTblParts != null, ex, tbl_parts.keySet().toString());
       }
       return;
     }

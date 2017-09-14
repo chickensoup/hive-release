@@ -271,10 +271,14 @@ public class DummyRawStoreForJdoConnection implements RawStore {
   @Override
   public void alterPartitions(String db_name, String tbl_name, List<List<String>> part_vals_list,
       List<Partition> new_parts) throws InvalidObjectException, MetaException {
-
-
   }
 
+  @Override
+  public void alterPartitionsForTables(String db_name, Map<String,
+          List<List<String>>> table_partVals, Map<String, List<Partition>> table_newParts)
+          throws InvalidObjectException, MetaException {
+
+  }
 
   @Override
   public boolean addIndex(Index index) throws InvalidObjectException, MetaException {

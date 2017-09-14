@@ -18,6 +18,7 @@
 package org.apache.hadoop.hive.metastore;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.hadoop.conf.Configurable;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
@@ -115,7 +116,7 @@ public interface AlterHandler extends Configurable {
    *          database of the partition being altered
    * @param name
    *          table of the partition being altered
-   * @param new_parts
+   * @param new_part
    *          new partition list
    * @return the altered partition list
    * @throws InvalidOperationException
@@ -127,4 +128,26 @@ public interface AlterHandler extends Configurable {
       final String dbname, final String name, final List<Partition> new_part)
       throws InvalidOperationException, InvalidObjectException, AlreadyExistsException,
       MetaException;
+
+  /**
+   * handles alter partitions
+   *
+   * @param msdb
+   *          object to get metadata
+   * @param wh
+   * @param dbname
+   *          database of the partition being altered
+   * @param tbl_parts
+   *          map of table and new partitions
+   * @return the altered partition list
+   * @throws InvalidOperationException
+   * @throws InvalidObjectException
+   * @throws AlreadyExistsException
+   * @throws MetaException
+   */
+  public abstract Map<String, List<Partition>> alterPartitionsForTables(final RawStore msdb, Warehouse wh,
+                                                                        final String dbname, final Map<String, List<Partition>> tbl_parts)
+          throws InvalidOperationException, InvalidObjectException, AlreadyExistsException,
+          MetaException;
+
 }

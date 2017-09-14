@@ -1031,7 +1031,7 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
                 struct.stageList = new ArrayList<Stage>(_list108.size);
                 for (int _i109 = 0; _i109 < _list108.size; ++_i109)
                 {
-                  Stage _elem110; // required
+                  Stage _elem110; // optional
                   _elem110 = new Stage();
                   _elem110.read(iprot);
                   struct.stageList.add(_elem110);
@@ -1273,7 +1273,7 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
           struct.stageList = new ArrayList<Stage>(_list125.size);
           for (int _i126 = 0; _i126 < _list125.size; ++_i126)
           {
-            Stage _elem127; // required
+            Stage _elem127; // optional
             _elem127 = new Stage();
             _elem127.read(iprot);
             struct.stageList.add(_elem127);

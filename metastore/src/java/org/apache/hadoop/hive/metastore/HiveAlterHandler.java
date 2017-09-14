@@ -19,9 +19,7 @@ package org.apache.hadoop.hive.metastore;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -528,6 +526,54 @@ public class HiveAlterHandler implements AlterHandler {
     }
     return oldParts;
   }
+
+  @Override
+  public Map<String, List<Partition>> alterPartitionsForTables(final RawStore msdb, Warehouse wh, final String dbname,
+                                                               final Map<String, List<Partition>> tbl_parts)
+          throws InvalidOperationException, InvalidObjectException, AlreadyExistsException, MetaException {
+    Map<String, List<List<String>>> table_partVals = new HashMap<>();
+    Map<String, List<Partition>> oldTblParts = new HashMap<>();
+    try {
+      for (Map.Entry<String, List<Partition>> entry: tbl_parts.entrySet()) {
+        List<Partition> oldParts = new ArrayList<Partition>();
+        List<List<String>> partValsList = new ArrayList<List<String>>();
+
+        String tableName = entry.getKey();
+        List<Partition> new_parts = entry.getValue();
+        Table tbl = msdb.getTable(dbname, tableName);
+
+        for (Partition tmpPart: new_parts) {
+          // Set DDL time to now if not specified
+          if (tmpPart.getParameters() == null ||
+                  tmpPart.getParameters().get(hive_metastoreConstants.DDL_TIME) == null ||
+                  Integer.parseInt(tmpPart.getParameters().get(hive_metastoreConstants.DDL_TIME)) == 0) {
+            tmpPart.putToParameters(hive_metastoreConstants.DDL_TIME, Long.toString(System
+                    .currentTimeMillis() / 1000));
+          }
+
+          Partition oldTmpPart = msdb.getPartition(dbname, tableName, tmpPart.getValues());
+          oldParts.add(oldTmpPart);
+          oldTblParts.put(tableName, oldParts);
+          partValsList.add(tmpPart.getValues());
+          table_partVals.put(tableName, partValsList);
+
+          if (MetaStoreUtils.requireCalStats(hiveConf, oldTmpPart, tmpPart, tbl)) {
+            MetaStoreUtils.updatePartitionStatsFast(tmpPart, wh, false, true);
+          }
+          updatePartColumnStats(msdb, dbname, tableName, oldTmpPart.getValues(), tmpPart);
+        }
+      }
+
+      msdb.alterPartitionsForTables(dbname, table_partVals, tbl_parts);
+    } catch (InvalidObjectException e) {
+      throw new InvalidOperationException("alter is not possible");
+    } catch (NoSuchObjectException e){
+      //old partition does not exist
+      throw new InvalidOperationException("alter is not possible");
+    }
+    return oldTblParts;
+  }
+
 
   private boolean checkPartialPartKeysEqual(List<FieldSchema> oldPartKeys,
       List<FieldSchema> newPartKeys) {
